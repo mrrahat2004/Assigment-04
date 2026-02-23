@@ -120,7 +120,96 @@
        {id: 8, company: "TechCorp Industries", role: "Senior Frontend Developer", loc: "San Francisco, CA •", type: "Full-time • ", salary: "$130,000-$175,000", desc: "We are looking for an experienced Frontend Developer to build scalable web applications using React and TypeScript. You will work with a talented team on cutting-edge projects.", status: "all"
        },   
      ];
+     
+     let activeTab = 'all';
 
+     function render(){
+        const container = document.getElementById('jobs-container');
+        const filtered = jobs.filter( j => activeTab === 'all' ? true : j.status === activeTab);
+
+        document.getElementById('total-dash').innerText = jobs.length;
+        document.getElementById('interview-dash').innerText = jobs.filter(j => j.status === 'interview').length;
+        document.getElementById('rejected-dash').innerText = jobs.filter(j => j.status === 'rejected').length;
+        document.getElementById('section-count').innerText = filtered.length;
+
+        container.innerHTML = '';
+
+        if (filtered.length === 0) {
+            container.innerHTML = `
+            <div class="flex flex-col items-center justify-center py-20 bg-white rounded-xl border border-gray-100">
+                <img src="jobs.png" class="w-20 mb-4 opacity-50" alt="No Jobs">
+                <h3 class="text-xl font-bold text-gray-700">
+                    No Jobs Available</h3>
+                    <p class="text-gray-400">Current status: ${activeTab.toUpperCase()}</p>
+            </div>`; 
+            return;   
+        }
+
+        filtered.forEach(job => {
+            const card = document.createElement('div');
+            card.className = "bg-white p-8 rounded-xl border border-gray-100 shadow-sm relative group transition-all hover:shadow-md";
+            card.innerHTML = `
+            <button onclick="deleteJob(${job.id})" class="absolute top-6 right-8 p-2 rounded-lg bg-gray-50 text-gray-300 hover:text-red-500 hover:bg-red-50 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                </svg>
+            </button>
+            <h3 class="text-3xl font-bold text-gray-900 mb-1">${job.company}</h3>
+            <p class="text-[#2563EB] font-semibold mb-3 text-xl">${job.role}</p>
+            <div class="flex flex-wrap gap-4 text-gray-400 mb-4 font-medium uppercase tracking-wider">
+                <span>${job.loc}</span> • <span>${job.type}</span> • <span>${job.salary}</span>
+            </div>
+            <div class="mb-4">
+                <span class="px-3 py-1 text-[20px] font-black rounded bg-blue-50 text-blue-600 border border-blue-100 uppercase tracking-tighter">
+                    ${job.status === 'all' ? 'NOT APPLIED' : job.status}
+                </span>
+            </div>
+            <p class="text-gray-500 text-[17px] mb-6 leading-relaxed max-w-2xl">${job.desc}</p>
+            <div class="flex gap-4">
+                <button onclick="updateStatus(${job.id}, 'interview')" class="px-6 py-2 rounded-lg border-2 font-black tracking-widest transition-all
+                    ${job.status === 'interview' ? 'bg-[#10B981] border-[#10B981] text-white' : 'border-[#10B981] text-[#10B981] hover:bg-[#F0FDF4]'}">
+                    INTERVIEW
+                </button>
+                <button onclick="updateStatus(${job.id}, 'rejected')" class="px-6 py-2 rounded-lg border-2 font-black tracking-widest transition-all
+                    ${job.status === 'rejected' ? 'bg-[#EF4444] border-[#EF4444] text-white' : 'border-[#EF4444] text-[#EF4444] hover:bg-[#FEF2F2]'}">
+                    REJECTED
+                </button>
+            </div>
+        `;
+        container.appendChild(card);
+
+        });
+
+     }
+
+     function updateStatus(id, newStatus) {
+        const job = jobs.find(j => j.id === id);
+        job.status = (job.status === newStatus) ? 'all':
+        newStatus;
+        render();
+     }
+
+     function changeTab(tab){
+        activeTab = tab ; 
+        ['all', 'interview', 'rejected'].forEach(t => {
+            const btn = document.getElementById(`tab-${t}`);
+            if (t === tab) {
+                btn.className = "px-6 py-2 rounded-md font-bold transition-all bg-[#2563EB] text-white";
+            }
+            else {
+                btn.className = "px-6 py-2 rounded-md font-bold transition-all text-gray-500 hover:bg-white";
+            }
+        });
+        render();
+     }
+
+     function deleteJob(id) {
+        jobs = jobs.filter(j => j.id !== id);
+        render();
+     }
+
+     render();
+        
 
     </script>
     
